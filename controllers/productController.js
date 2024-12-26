@@ -1,4 +1,5 @@
 import { v2 as cloudinary } from "cloudinary";
+import productModel from "../models/productModel.js";
 // function for add product
 const addProduct = async (req, res) => {
   try {
@@ -30,27 +31,54 @@ const addProduct = async (req, res) => {
       })
     );
 
-    console.log(
+    const productData = {
       name,
       description,
-      price,
       category,
+      price: Number(price),
       subCategory,
-      sizes,
-      bestseller
-    );
-    console.log(imagesUrl);
+      bestseller: bestseller === "true" ? true : false,
+      sizes: JSON.parse(sizes),
+      image: imagesUrl,
+      date: Date.now(),
+    };
+    console.log(productData);
+    const product = new productModel(productData);
+    await product.save();
 
-    res.json({});
+    res.json({ success: true, message: "Product Added" });
   } catch (error) {
     console.log(error);
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 // function for list product
-const listProduct = async (req, res) => {};
+const listProduct = async (req, res) => {
+  try {
+    const products = await productModel.find({});
+    res.json({ success: true, products });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
 // function for deleting product
-const removeProduct = async (req, res) => {};
+const removeProduct = async (req, res) => {
+  try {
+    await productModel.findByIdAndDelete(req.body.id);
+    res.json({ success: true, message: "Product Removed" });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
 // function for single product info
-const singleProduct = async (req, res) => {};
+const singleProduct = async (req, res) => {
+  try {
+    const { productId } = req.body;
+    const product = await productModel.findById(productId);
+    res.json({ success: true, product });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
 
 export { addProduct, listProduct, removeProduct, singleProduct };
