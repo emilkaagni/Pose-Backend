@@ -34,10 +34,29 @@ const placeOrderFonepay = async (req, res) => {};
 // Add later for Fonepay / Esewa / Khalti
 
 // All orders data for Admin panel
-const allOrders = async (req, res) => {};
+const allOrders = async (req, res) => {
+  try {
+    const orders = await orderModel.find({});
+    res.json({ success: true, orders });
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: error.message });
+  }
+};
 
 // User orders for frontend
-const userOrders = async (req, res) => {};
+const userOrders = async (req, res) => {
+  try {
+    const { userId } = req.body;
+
+    const orders = await orderModel.find({ userId });
+
+    res.json({ success: true, orders });
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: error.message });
+  }
+};
 
 // Update order status from admin panel
 const UpdateStatus = async (req, res) => {};
